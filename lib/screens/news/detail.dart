@@ -13,12 +13,18 @@ class NewsDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
 
-    return Column(
-      children: [
-        Text(data.title, style: themeData.textTheme.titleLarge),
-        const SizedBox(height: 32),
-        Text(data.content, style: themeData.textTheme.bodyLarge),
-      ],
+    return Scaffold(
+      appBar: AppBar(),
+      body: ColoredBox(
+        color: Colors.white,
+        child: Column(
+          children: [
+            Text(data.title, style: themeData.textTheme.titleLarge),
+            const SizedBox(height: 32),
+            Text(data.content, style: themeData.textTheme.bodyLarge),
+          ],
+        ),
+      ),
     );
   }
 }

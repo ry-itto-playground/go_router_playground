@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class UserScreen extends StatelessWidget {
   const UserScreen({
@@ -10,7 +11,7 @@ class UserScreen extends StatelessWidget {
     return Center(
       child: TextButton(
         onPressed: () {
-          // TODO: Show login page with modal
+          GoRouter.of(context).push('/login');
         },
         child: const Text('Login'),
       ),
