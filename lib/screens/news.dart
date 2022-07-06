@@ -18,9 +18,7 @@ class NewsScreen extends ConsumerWidget {
         return ListTile(
           title: Text(newsData[index].title),
           onTap: () {
-            // NewsDetailRoute(id: newsData[index].id).go(context);
-            router.push(NewsDetailRoute(id: newsData[index].id).location);
-            print(router.location);
+            router.go(NewsDetailRoute(id: newsData[index].id - 1).location);
           },
         );
       },

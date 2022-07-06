@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -38,7 +41,9 @@ class HomeRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<NewsRoute>(path: '/news')
+@TypedGoRoute<NewsRoute>(path: '/news', routes: [
+  TypedGoRoute<NewsDetailRoute>(path: ':id'),
+])
 class NewsRoute extends GoRouteData {
   @override
   Widget build(BuildContext context) {
@@ -65,6 +70,24 @@ class NewsDetailRoute extends GoRouteData {
   }
 }
 
+@TypedGoRoute<LoginRoute>(path: '/login')
+class LoginRoute extends GoRouteData {
+  const LoginRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context) {
+    return defaultTargetPlatform == TargetPlatform.iOS
+        ? CupertinoPage(
+            fullscreenDialog: true,
+            child: LoginScreen(),
+          )
+        : MaterialPage(
+            fullscreenDialog: true,
+            child: LoginScreen(),
+          );
+  }
+}
+
 class GoRouterProviderScope extends StatelessWidget {
   const GoRouterProviderScope({
     super.key,
@@ -77,7 +100,6 @@ class GoRouterProviderScope extends StatelessWidget {
     final router = GoRouter(
       routes: $appRoutes,
       initialLocation: initialLocation,
-      debugLogDiagnostics: true,
     );
     return ProviderScope(
       overrides: [
