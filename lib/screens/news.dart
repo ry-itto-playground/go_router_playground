@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router_playground/model/news.dart';
+import 'package:go_router_playground/router.dart';
 
-import 'news/detail.dart';
-
-class NewsScreen extends StatelessWidget {
+class NewsScreen extends ConsumerWidget {
   const NewsScreen({
     Key? key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
     return ListView.separated(
       itemCount: newsData.length,
       itemBuilder: (context, index) {
         return ListTile(
           title: Text(newsData[index].title),
           onTap: () {
-            GoRouter.of(context).push('/news/${newsData[index].id}');
+            // NewsDetailRoute(id: newsData[index].id).go(context);
+            router.push(NewsDetailRoute(id: newsData[index].id).location);
+            print(router.location);
           },
         );
       },

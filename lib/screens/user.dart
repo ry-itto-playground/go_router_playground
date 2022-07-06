@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:go_router_playground/router.dart';
 
 class UserScreen extends StatelessWidget {
   const UserScreen({
@@ -11,7 +11,8 @@ class UserScreen extends StatelessWidget {
     return Center(
       child: TextButton(
         onPressed: () {
-          GoRouter.of(context).push('/login');
+          // router.go(const LoginRoute().location);
+          // const LoginRoute().go(context);
         },
         child: const Text('Login'),
       ),

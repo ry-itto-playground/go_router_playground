@@ -1,127 +1,106 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:go_router_playground/router.dart';
 
-import 'model/news.dart';
-import 'screens/news/detail.dart';
 import 'screens/screens.dart';
+import 'router.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
-final _router = GoRouter(
-  routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) {
-        return const RootScreen();
-      },
-    ),
-    GoRoute(
-      path: '/home',
-      builder: (context, state) {
-        return const HomeScreen();
-      },
-    ),
-    GoRoute(
-      path: '/news',
-      builder: (context, state) {
-        return const NewsScreen();
-      },
-      routes: [
-        GoRoute(
-          path: ':id',
-          builder: (context, state) {
-            final id = int.parse(state.params['id']!);
-            final data = newsData.firstWhere((n) => n.id == id);
-            return NewsDetailScreen(
-              data: data,
-            );
-          },
-        ),
-      ],
-    ),
-    GoRoute(
-      path: '/user',
-      builder: (context, state) {
-        return const UserScreen();
-      },
-    ),
-    GoRoute(
-      path: '/login',
-      pageBuilder: (context, state) {
-        if (defaultTargetPlatform == TargetPlatform.iOS) {
-          return CupertinoPage(
-            fullscreenDialog: true,
-            child: LoginScreen(),
-          );
-        } else {
-          return MaterialPage(
-            fullscreenDialog: true,
-            child: LoginScreen(),
-          );
-        }
-      },
-    ),
-  ],
-);
-
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rootRouter = ref.watch(rootRouterProvider);
+
     return MaterialApp.router(
-      routerDelegate: _router.routerDelegate,
-      routeInformationParser: _router.routeInformationParser,
+      routerDelegate: rootRouter.routerDelegate,
+      routeInformationParser: rootRouter.routeInformationParser,
     );
   }
 }
 
 class RootScreen extends StatefulWidget {
-  const RootScreen({Key? key}) : super(key: key);
+  const RootScreen({
+    Key? key,
+    this.initialTab = AppTab.home,
+  }) : super(key: key);
+
+  final AppTab initialTab;
 
   @override
   RootScreenState createState() => RootScreenState();
 }
 
 class RootScreenState extends State<RootScreen> {
-  int currentIndex = 0;
+  AppTab? currentTab;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: IndexedStack(
-        index: currentIndex,
-        children: const [
-          HomeScreen(),
-          NewsScreen(),
-          UserScreen(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) => setState(() {
-          currentIndex = index;
-        }),
-        currentIndex: currentIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'News',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'User',
-          ),
-        ],
+    return ProviderScope(
+      overrides: [
+        rootRouterProvider.overrideWithValue(GoRouter.of(context)),
+      ],
+      child: Scaffold(
+        appBar: AppBar(title: Text((currentTab ?? widget.initialTab).name)),
+        body: GoRouterProviderScope(
+          initialLocation: currentTabLocation,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          onTap: (index) => setState(() {
+            currentTab = AppTab.values[index];
+          }),
+          currentIndex: AppTab.values.indexOf(currentTab ?? widget.initialTab),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications),
+              label: 'News',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              label: 'User',
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget get currentBody {
+    switch (currentTab ?? widget.initialTab) {
+      case AppTab.home:
+        return const HomeScreen();
+      case AppTab.news:
+        return const NewsScreen();
+      case AppTab.user:
+        return const UserScreen();
+      default:
+        throw UnimplementedError();
+    }
+  }
+
+  String get currentTabLocation {
+    switch (currentTab ?? widget.initialTab) {
+      case AppTab.home:
+        return HomeRoute().location;
+      case AppTab.news:
+        return NewsRoute().location;
+      case AppTab.user:
+        return UserRoute().location;
+      default:
+        throw UnimplementedError();
+    }
   }
 }

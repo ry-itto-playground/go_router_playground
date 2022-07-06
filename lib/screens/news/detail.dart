@@ -12,6 +12,7 @@ class NewsDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
+    print('object');
 
     return Scaffold(
       appBar: AppBar(),
